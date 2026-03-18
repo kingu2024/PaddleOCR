@@ -237,7 +237,7 @@ def get_args(add_help=True):
     parser.add_argument("--warmup", default=0, type=int, help="warmup iter")
     parser.add_argument("--polygon", action="store_true", help="output polygon or box")
 
-    parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--use_gpu", type=str2bool, default=False)
     parser.add_argument("--use_tensorrt", type=str2bool, default=False)
     parser.add_argument("--precision", type=str, default="fp32")
     parser.add_argument("--gpu_mem", type=int, default=500)
