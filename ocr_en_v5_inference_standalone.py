@@ -48,7 +48,12 @@ class OCRENV5Recognizer:
     including image preprocessing, model inference, and post-processing.
 
     Args:
-        model_dir: Directory containing the inference model (inference.pdmodel, inference.pdiparams)
+        model_dir: Directory containing the inference model files
+                   Supported formats:
+                   - inference.pdmodel + inference.pdiparams (standard format)
+                   - inference.json + inference.pdiparams (new format, PaddlePaddle 3.0+)
+                   - model.pdmodel + model.pdiparams (alternative naming)
+                   - model.json + model.pdiparams (alternative naming)
         dict_path: Path to character dictionary file
         use_gpu: Whether to use GPU for inference
         use_space_char: Whether to recognize space character
@@ -96,16 +101,59 @@ class OCRENV5Recognizer:
             print("Please install it: pip install paddlepaddle-gpu or pip install paddlepaddle")
             sys.exit(1)
 
-        model_file = os.path.join(model_dir, "inference.pdmodel")
-        params_file = os.path.join(model_dir, "inference.pdiparams")
+        # Find model files - support both "inference" and "model" prefixes
+        # Also support both .pdmodel and .json formats
+        params_file_path = None
+        model_file_path = None
+        file_name = None
 
-        if not os.path.exists(model_file):
-            raise FileNotFoundError(f"Model file not found: {model_file}")
-        if not os.path.exists(params_file):
-            raise FileNotFoundError(f"Params file not found: {params_file}")
+        # Try to find .pdiparams file with different prefixes
+        file_names = ["inference", "model"]
+        for name in file_names:
+            params_path = os.path.join(model_dir, f"{name}.pdiparams")
+            if os.path.exists(params_path):
+                params_file_path = params_path
+                file_name = name
+                break
+
+        if params_file_path is None:
+            # List available files to help user debug
+            available_files = os.listdir(model_dir) if os.path.exists(model_dir) else []
+            raise FileNotFoundError(
+                f"Model parameters file not found in: {model_dir}\n"
+                f"Expected: 'inference.pdiparams' or 'model.pdiparams'\n"
+                f"Available files: {available_files}\n"
+                f"Please download the correct model files."
+            )
+
+        # Find model structure file (.json preferred over .pdmodel)
+        json_path = os.path.join(model_dir, f"{file_name}.json")
+        pdmodel_path = os.path.join(model_dir, f"{file_name}.pdmodel")
+
+        if os.path.exists(json_path):
+            model_file_path = json_path
+            print(f"Found model structure: {file_name}.json (new format)")
+        elif os.path.exists(pdmodel_path):
+            model_file_path = pdmodel_path
+            print(f"Found model structure: {file_name}.pdmodel")
+        else:
+            # List available files to help user debug
+            available_files = os.listdir(model_dir) if os.path.exists(model_dir) else []
+            raise FileNotFoundError(
+                f"Model structure file not found in: {model_dir}\n"
+                f"Expected: '{file_name}.pdmodel' or '{file_name}.json'\n"
+                f"Found parameters: {params_file_path}\n"
+                f"Available files: {available_files}\n\n"
+                f"Note: A complete model requires both structure (.pdmodel or .json) and parameters (.pdiparams) files.\n"
+                f"Please ensure you have downloaded the complete model package."
+            )
+
+        print(f"Loading model from: {model_dir}")
+        print(f"  Model structure: {os.path.basename(model_file_path)}")
+        print(f"  Model parameters: {os.path.basename(params_file_path)}")
 
         # Configure predictor
-        config = paddle_infer.Config(model_file, params_file)
+        config = paddle_infer.Config(model_file_path, params_file_path)
 
         if use_gpu:
             config.enable_use_gpu(500, 0)

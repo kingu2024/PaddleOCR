@@ -44,6 +44,15 @@ wget https://paddleocr.bj.bcebos.com/PP-OCRv5/english/en_PP-OCRv5_mobile_rec_inf
 tar -xf en_PP-OCRv5_mobile_rec_infer.tar
 ```
 
+**支持的模型文件格式：**
+- 标准格式: `inference.pdmodel` + `inference.pdiparams`
+- 新格式 (PaddlePaddle 3.0+): `inference.json` + `inference.pdiparams`
+- 替代命名: `model.pdmodel` + `model.pdiparams` 或 `model.json` + `model.pdiparams`
+
+**注意：** 完整的模型需要两个文件：
+1. 模型结构文件 (`.pdmodel` 或 `.json`)
+2. 模型参数文件 (`.pdiparams`)
+
 ### 💡 使用方法
 
 #### 方法1: 命令行使用
@@ -201,7 +210,9 @@ python rec_postprocess_standalone.py
 
 ### ⚠️ 注意事项
 
-1. 确保模型文件存在: `inference.pdmodel` 和 `inference.pdiparams`
+1. **模型文件要求：** 必须同时包含模型结构文件（`.pdmodel` 或 `.json`）和参数文件（`.pdiparams`）
+   - 如果只有 `.pdiparams` 文件，说明模型下载不完整，请重新下载完整的模型包
+   - 脚本会自动检测并支持不同的文件命名格式
 2. 字典文件必须与模型训练时使用的字典一致
 3. 输入图片应为包含单行或少量文字的裁剪图片
 4. 对于复杂文档，建议先使用文本检测模型
@@ -253,6 +264,15 @@ Download EN PP-OCRv5 model from PaddleOCR model zoo:
 wget https://paddleocr.bj.bcebos.com/PP-OCRv5/english/en_PP-OCRv5_mobile_rec_infer.tar
 tar -xf en_PP-OCRv5_mobile_rec_infer.tar
 ```
+
+**Supported Model File Formats:**
+- Standard format: `inference.pdmodel` + `inference.pdiparams`
+- New format (PaddlePaddle 3.0+): `inference.json` + `inference.pdiparams`
+- Alternative naming: `model.pdmodel` + `model.pdiparams` or `model.json` + `model.pdiparams`
+
+**Note:** A complete model requires two files:
+1. Model structure file (`.pdmodel` or `.json`)
+2. Model parameters file (`.pdiparams`)
 
 ### 💡 Usage
 
@@ -411,7 +431,9 @@ This will run built-in examples showing:
 
 ### ⚠️ Notes
 
-1. Ensure model files exist: `inference.pdmodel` and `inference.pdiparams`
+1. **Model file requirements:** Must have both model structure file (`.pdmodel` or `.json`) and parameters file (`.pdiparams`)
+   - If you only have `.pdiparams` file, the model download is incomplete. Please re-download the complete model package
+   - The script will automatically detect and support different file naming formats
 2. Dictionary file must match the one used during model training
 3. Input images should be cropped images containing single line or small amount of text
 4. For complex documents, text detection model is recommended first

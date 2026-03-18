@@ -21,6 +21,12 @@ wget https://paddleocr.bj.bcebos.com/PP-OCRv5/english/en_PP-OCRv5_mobile_rec_inf
 tar -xf en_PP-OCRv5_mobile_rec_infer.tar
 ```
 
+**重要：** 确保解压后的目录包含完整的模型文件：
+- 模型结构文件：`inference.pdmodel` 或 `inference.json`
+- 模型参数文件：`inference.pdiparams`
+
+如果只有 `.pdiparams` 文件，说明下载不完整，请重新下载。
+
 ### 第三步：运行推理
 
 ```bash
@@ -169,13 +175,31 @@ pip install opencv-python
 ### Q3: 模型在哪里下载？
 访问: https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_ch/models_list.md
 
-### Q4: 能识别其他语言吗？
+**注意：** 下载后请确保模型文件完整，应包含：
+- 模型结构文件 (`.pdmodel` 或 `.json`)
+- 模型参数文件 (`.pdiparams`)
+
+### Q4: 提示"Model structure file not found"怎么办？
+这说明模型下载不完整。完整的模型需要两个文件：
+1. 结构文件：`inference.pdmodel` 或 `inference.json`
+2. 参数文件：`inference.pdiparams`
+
+请重新下载完整的模型包。
+
+### Q5: 支持哪些模型文件格式？
+支持以下格式：
+- `inference.pdmodel` + `inference.pdiparams` (标准格式)
+- `inference.json` + `inference.pdiparams` (新格式)
+- `model.pdmodel` + `model.pdiparams` (替代命名)
+- `model.json` + `model.pdiparams` (替代命名)
+
+### Q6: 能识别其他语言吗？
 这个脚本专门针对英文V5模型。对于其他语言，需要：
 1. 下载对应语言的模型
 2. 使用对应的字典文件
 3. 参数基本相同
 
-### Q5: 如何提高识别准确率？
+### Q7: 如何提高识别准确率？
 - 使用高分辨率图片
 - 确保文字区域清晰
 - 使用文本检测模型先裁剪文字区域
