@@ -161,9 +161,23 @@ class OCRENV5Recognizer:
             config.disable_gpu()
             config.set_cpu_math_library_num_threads(10)
 
+        # Enable new IR and executor (if available)
+        if hasattr(config, "enable_new_ir"):
+            config.enable_new_ir()
+        if hasattr(config, "enable_new_executor"):
+            config.enable_new_executor()
+
         # Memory optimization
         config.enable_memory_optim()
         config.disable_glog_info()
+
+        # Delete problematic optimization passes
+        config.delete_pass("conv_transpose_eltwiseadd_bn_fuse_pass")
+        config.delete_pass("matmul_transpose_reshape_fuse_pass")
+
+        # IR optimization settings
+        config.switch_use_feed_fetch_ops(False)
+        config.switch_ir_optim(True)
 
         # Create predictor
         predictor = paddle_infer.create_predictor(config)
